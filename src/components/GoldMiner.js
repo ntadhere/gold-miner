@@ -12,19 +12,31 @@ const GoldMiner = () => {
     const goldImg = new Image();
     goldImg.src = goldImgSrc;
 
-    let angle = 0;
-    let angleSpeed = 2;
-    let direction = 1;
-    let length = 100;
+    let angle = 0; // Start angle for the rope
+    let angleSpeed = 2; // Speed at which the rope swings
+    let direction = 1; // Direction of the swing: 1 for right, -1 for left
+    let length = 100; // Initial length of the rope
     let extending = false;
     let retracting = false;
     const baseX = canvas.width / 2;
     const baseY = 0;
     const maxLength = 1000; // fallback max length
     const minLength = 100;
-    
-    // Adjust gold positions as needed
-    let golds = [{ x: 400, y: 300, value: 100 }, { x: 500, y: 350, value: 50 }];
+
+    // Function to generate random positions for gold pieces
+    const generateRandomGold = (count) => {
+      const golds = [];
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * (canvas.width - 40); // Random x within canvas width
+        const y = Math.random() * (canvas.height - 40); // Random y within canvas height
+        golds.push({ x, y, value: Math.floor(Math.random() * 100) + 50 }); // Random value between 50 and 150
+      }
+      return golds;
+    };
+
+    // Generate random gold pieces each time the page is reloaded
+    let golds = generateRandomGold(5); // Generate 5 random gold pieces
+
     let score = 0;
     let grabbedGold = null;
 
@@ -55,10 +67,10 @@ const GoldMiner = () => {
         length += 5;
         const dx = Math.cos((angle * Math.PI) / 180) * length;
         const dy = Math.sin((angle * Math.PI) / 180) * length;
-        
+
         // Check collision with gold
         checkCollision(baseX + dx, baseY + dy);
-        
+
         // If we reach the preset maximum or the tip goes out-of-bound, stop extending
         if (
           length >= maxLength ||
