@@ -20,10 +20,10 @@ const GoldMiner = () => {
     let retracting = false;
     const baseX = canvas.width / 2;
     const baseY = 0;
-    const maxLength = 1000; // fallback max length
+    const maxLength = 300;
     const minLength = 100;
     
-    // Adjust gold positions as needed
+    // Adjusted gold positions to bring them closer
     let golds = [{ x: 400, y: 300, value: 100 }, { x: 500, y: 350, value: 50 }];
     let score = 0;
     let grabbedGold = null;
@@ -45,31 +45,20 @@ const GoldMiner = () => {
     };
 
     const update = () => {
-      // Only swing when not extending or retracting
       if (!extending && !retracting) {
         angle += angleSpeed * direction;
-        if (angle > 90 || angle < -90) direction *= -1; // wider swing
+        if (angle > 180 || angle < 0) direction *= -1; // Increased angle range for wider swing
       }
 
       if (extending) {
         length += 5;
-        const dx = Math.cos((angle * Math.PI) / 180) * length;
-        const dy = Math.sin((angle * Math.PI) / 180) * length;
-        
-        // Check collision with gold
-        checkCollision(baseX + dx, baseY + dy);
-        
-        // If we reach the preset maximum or the tip goes out-of-bound, stop extending
-        if (
-          length >= maxLength ||
-          baseX + dx < 0 ||
-          baseX + dx > canvas.width ||
-          baseY + dy < 0 ||
-          baseY + dy > canvas.height
-        ) {
+        if (length >= maxLength) {
           extending = false;
           retracting = true;
         }
+        const dx = Math.cos((angle * Math.PI) / 180) * length;
+        const dy = Math.sin((angle * Math.PI) / 180) * length;
+        checkCollision(baseX + dx, baseY + dy);
       }
 
       if (retracting) {
@@ -89,7 +78,7 @@ const GoldMiner = () => {
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw the rope/claw line
+      // Rope
       const dx = Math.cos((angle * Math.PI) / 180) * length;
       const dy = Math.sin((angle * Math.PI) / 180) * length;
       ctx.beginPath();
@@ -99,12 +88,12 @@ const GoldMiner = () => {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Draw gold pieces
+      // Gold
       for (let g of golds) {
         ctx.drawImage(goldImg, g.x - 20, g.y - 20, 40, 40);
       }
 
-      // Display the score
+      // Score
       ctx.fillStyle = "black";
       ctx.font = "24px Arial";
       ctx.fillText(`Score: ${score}`, 10, 30);
